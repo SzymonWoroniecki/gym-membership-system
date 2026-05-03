@@ -2,13 +2,12 @@ package io.github.SzymonWoroniecki.gym_membership_system.entity;
 
 import io.github.SzymonWoroniecki.gym_membership_system.enums.PlanType;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.math.BigDecimal;
 
 @Entity
 @Table(name = "membership_plan")
@@ -32,16 +31,10 @@ public class MembershipPlan {
     @Column(nullable = false, length = 20)
     private PlanType type;
 
-    @NotNull(message = "Price amount is required")
-    @DecimalMin(value = "0.00", message = "Price cannot be negative")
-    @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal amount;
-
-    @NotNull(message = "Currency is required")
-    @Size(min = 3, max = 3, message = "Currency code must be 3 characters (ISO 4217)")
-    @Pattern(regexp = "^[A-Z]{3}$", message = "Currency must be uppercase letters")
-    @Column(nullable = false, length = 3)
-    private String currency;
+    @NotNull(message = "Price is required")
+    @Valid
+    @Embedded
+    private Money price;
 
     @NotNull(message = "Duration is required")
     @Min(value = 1, message = "Duration must be at least 1 month")
