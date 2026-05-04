@@ -9,7 +9,6 @@ public record MemberResponse(
         Long id,
         String fullName,
         String email,
-        MembershipPlan plan,
         LocalDate membershipStartDate,
         MembershipStatus status,
         Long planId,
