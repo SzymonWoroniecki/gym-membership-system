@@ -3,6 +3,7 @@ package io.github.SzymonWoroniecki.gym_membership_system.service;
 import io.github.SzymonWoroniecki.gym_membership_system.dto.GymRequest;
 import io.github.SzymonWoroniecki.gym_membership_system.dto.GymResponse;
 import io.github.SzymonWoroniecki.gym_membership_system.entity.Gym;
+import io.github.SzymonWoroniecki.gym_membership_system.exception.GymAlreadyExistsException;
 import io.github.SzymonWoroniecki.gym_membership_system.repository.GymRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ public class GymService {
 
         // 1. Walidacja biznesowa: czy nazwa już istnieje (case-insensitive)
         if (gymRepository.existsByNameIgnoreCase(request.name())){
-            throw new IllegalStateException("Gym with name '" + request.name() + "' already exists");
+            throw new GymAlreadyExistsException(request.name());
         }
 
         // 2. Mapowanie DTO -> Entity

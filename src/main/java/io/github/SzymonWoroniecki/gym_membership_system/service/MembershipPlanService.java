@@ -5,6 +5,7 @@ import io.github.SzymonWoroniecki.gym_membership_system.dto.MembershipPlanRespon
 import io.github.SzymonWoroniecki.gym_membership_system.entity.Gym;
 import io.github.SzymonWoroniecki.gym_membership_system.entity.MembershipPlan;
 import io.github.SzymonWoroniecki.gym_membership_system.entity.Money;
+import io.github.SzymonWoroniecki.gym_membership_system.exception.GymNotFoundException;
 import io.github.SzymonWoroniecki.gym_membership_system.repository.GymRepository;
 
 import io.github.SzymonWoroniecki.gym_membership_system.repository.MembershipPlanRepository;
@@ -26,7 +27,7 @@ public class MembershipPlanService {
     public MembershipPlanResponse createPlan(Long gymId, MembershipPlanRequest request){
         // 1. Sprawdź czy siłownia istnieje
         Gym gym = gymRepository.findById(gymId)
-                .orElseThrow(() -> new IllegalArgumentException("Gym not found with id: " + gymId ));
+                .orElseThrow(() -> new GymNotFoundException(gymId));
 
         // 2. Mapowanie DTO -> Entity
         MembershipPlan plan = new MembershipPlan();
@@ -47,7 +48,7 @@ public class MembershipPlanService {
     public List<MembershipPlanResponse> getPlansByGym(Long gymId){
         // Sprawdź czy siłownia istnieje
         if (!gymRepository.existsById(gymId)){
-            throw new IllegalArgumentException("Gym not found with id: " + gymId);
+            throw new GymNotFoundException(gymId);
         }
         return planRepository.findByGymId(gymId).stream()
                 .map(this::mapToResponse)

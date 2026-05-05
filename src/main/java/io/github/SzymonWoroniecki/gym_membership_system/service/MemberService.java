@@ -6,6 +6,7 @@ import io.github.SzymonWoroniecki.gym_membership_system.dto.MemberResponse;
 import io.github.SzymonWoroniecki.gym_membership_system.entity.Member;
 import io.github.SzymonWoroniecki.gym_membership_system.entity.MembershipPlan;
 import io.github.SzymonWoroniecki.gym_membership_system.enums.MembershipStatus;
+import io.github.SzymonWoroniecki.gym_membership_system.exception.*;
 import io.github.SzymonWoroniecki.gym_membership_system.repository.MemberRepository;
 import io.github.SzymonWoroniecki.gym_membership_system.repository.MembershipPlanRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,18 +27,16 @@ public class MemberService {
     public MemberResponse register(Long planId, MemberRequest request){
         // 1. Pobranie planu - jeśli nie istnieje, rzuca wyjątek
         MembershipPlan plan = planRepository.findById(planId)
-                .orElseThrow(() -> new IllegalArgumentException("Plan not found with id: " + planId));
+                .orElseThrow(() -> new PlanNotFoundException(planId));
         // 2. Capacity check
         long activeCount = memberRepository.countByPlanIdAndStatus(planId, MembershipStatus.ACTIVE);
         if (activeCount >= plan.getMaxMembers()){
-            throw new IllegalStateException(
-                    "Plan capacity reached: " + activeCount + " of " + plan.getMaxMembers() + " members"
-            );
+            throw new PlanCapacityReachedException(activeCount, plan.getMaxMembers());
         }
 
         // 3. Sprawdzanie unikalności emaila
         if (memberRepository.existsByEmailIgnoreCase(request.email())){
-            throw new IllegalStateException("Member with email '" + request.email() + "' already exists");
+            throw new EmailAlreadyExistsException(request.email());
         }
 
         // 4. Stwarzanie nowego członka
@@ -56,11 +55,11 @@ public class MemberService {
     public MemberResponse cancel(Long memberId){
         // 1. Pobranie Członka
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found with id: " + memberId));
+                .orElseThrow(() -> new MemberNotFoundException(memberId));
 
         // 2. Sprawdzanie czy już nie jest anulowany
         if (member.getStatus() == MembershipStatus.CANCELLED) {
-            throw new IllegalStateException("Member is already cancelled");
+            throw new MemberAlreadyCancelledException(memberId);
         }
 
         // 3. Zmiana statusu
