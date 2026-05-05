@@ -122,6 +122,35 @@ Response: `200 OK` with the updated member.
 
 ---
 
+### Reports
+
+#### Monthly revenue report
+`GET /reports/revenue`
+
+Returns total revenue per gym, grouped by currency. Calculated from active members' plan prices. Cancelled members are excluded from the calculation.
+
+Response: `200 OK` with array of revenue items.
+
+Example response:
+```json
+[
+  {
+    "gymId": 1,
+    "gymName": "FitLife",
+    "currency": "PLN",
+    "totalAmount": 2997.00
+  },
+  {
+    "gymId": 2,
+    "gymName": "Iron Gym",
+    "currency": "EUR",
+    "totalAmount": 450.00
+  }
+]
+```
+
+---
+
 ## Error Handling
 
 The API returns structured JSON error responses with appropriate HTTP status codes:
